@@ -1,125 +1,197 @@
-# produkt — Design and interaction system
+# produkt — Product and interface design
 
-## Product feel
+**Concept:** FlowStitch — a hybrid diagram language, spatial architecture canvas, conversational co-architect, and lightweight UI/data storyboard.
+**Design direction:** Dark-mode engineering workbench / tactical minimalism.
+**Primary use:** working application screen, desktop first.
 
-produkt should feel like a focused engineering workbench: precise, quiet, information-dense, and easy to scan. Use the requested Dark-Mode Engineering Workbench direction. Avoid decorative gradients, glass effects, and motion that does not communicate state. Let graph structure and typography carry the visual hierarchy.
+## 1. Art direction
 
-## Design tokens
+The interface should feel like a live system map: precise, calm, and information-rich. Its visual identity comes from the product’s own materials—the monospaced diagram source, aligned graph topology, named ports, and moving storyboard signal. Avoid generic dashboard cards, ornamental gradients, glass effects, and decorative icon tiles. Use the canvas as the dominant surface; panels are tools around it.
 
-| Token | Value | Use |
+The experience joins three familiar mental models without copying their entire products:
+
+- **Diagram languages:** compact, versionable intent in text.
+- **Spatial whiteboards:** freely positioned objects and relationships.
+- **UI design tools:** tangible but deliberately low-fidelity components.
+
+## 2. Visual tokens
+
+### Primitive colors
+
+| Token | Value | Role |
 |---|---|---|
-| `--background` | `#090D16` | App and canvas base |
-| `--surface` | `#131B2E` | Panels, nodes, popovers |
-| `--surface-raised` | `#19243A` | Hovered/raised controls and selected node interiors |
-| `--border` | `#26334B` | Fine panel and node borders |
-| `--text` | `#E2E8F0` | Primary text |
-| `--text-muted` | `#94A3B8` | Secondary text and metadata |
-| `--accent` | `#6366F1` | Primary actions, selection, focus |
-| `--accent-active` | `#818CF8` | Active flow and selected edge |
-| `--signal` | `#10B981` | Successful/active simulation signal |
-| `--edge` | `#475569` | Default graph edge |
-| `--danger` | `#F87171` | Errors and destructive actions |
+| `--color-space` | `#090D16` | Deep-space app/canvas ground |
+| `--color-slate-panel` | `#131B2E` | Node and panel surface |
+| `--color-slate-raised` | `#19243A` | Raised/hovered surface |
+| `--color-border` | `#26334B` | Fine separators and outlines |
+| `--color-indigo` | `#6366F1` | Primary action and selection |
+| `--color-indigo-flow` | `#818CF8` | Active flow and focused edge |
+| `--color-emerald` | `#10B981` | Successful simulation signal |
+| `--color-edge` | `#475569` | Default connector |
+| `--color-text` | `#E2E8F0` | Primary text |
+| `--color-muted` | `#94A3B8` | Secondary text |
+| `--color-danger` | `#F87171` | Invalid input and destructive state |
 
-Set the default color scheme to dark. Check text and focus contrast against actual component backgrounds; do not rely on color alone to communicate state.
+### Semantic tokens
 
-### Type
+Map primitives to semantic CSS custom properties: `--background`, `--surface`, `--surface-raised`, `--border`, `--text-primary`, `--text-secondary`, `--action-primary`, `--flow-active`, `--signal-success`, `--edge-default`, and `--status-error`. Components consume semantic tokens; do not scatter raw hex values through component styles.
 
-- **Inter** for interface text, labels, navigation, and explanatory content.
-- **JetBrains Mono** for DSL, node IDs, payload previews, and mapped values.
-- Use a clear compact hierarchy: 12 px metadata, 13–14 px controls and body copy, 16–18 px section titles, and 20–24 px workspace title. Keep code at a comfortable readable size and do not shrink it to fit.
+### Typography
 
-### Shape, spacing, and canvas texture
+- Inter for interface labels, controls, help, chat prose, and node titles.
+- JetBrains Mono for DSL, identifiers, port names where compactness matters, schemas, and payload inspection.
+- Keep labels readable at normal zoom. Zooming the canvas scales graph content, not the surrounding editor and controls.
+- Use weight and spacing for hierarchy before adding more colors. Avoid all-uppercase micro-labels as the default.
 
-- Use a 4 px base spacing rhythm, with 8/12/16/24 px common gaps.
-- Use `rounded-md` (6 px) for panels, controls, and node cards; reserve pill shapes for compact status tags.
-- Use 1 px crisp borders. Shadows should be restrained and indicate elevation only.
-- The canvas has a low-contrast grid overlay over `--background`; keep it subtle behind edges and labels.
+### Geometry and texture
 
-## Workspace layout
+- 4 px base spacing; common increments 8, 12, 16, 24, 32 px.
+- `rounded-md` / 6 px corners for controls, panels, and nodes; avoid excessive pill forms.
+- Thin, crisp borders and subtle elevation. Use shadow only for floating menus or drag previews.
+- Low-contrast grid dots/lines on the canvas; fade the grid behind dense areas and keep it subordinate to edges.
+- Prefer large quiet fields of color and a small number of useful separators to stacks of nested cards.
+
+## 3. Workspace composition
 
 ```text
-┌────────────────────┬─────────────────────────────────────┐
-│ Code | Chat        │                                     │
-│ DSL editor or      │       Infinite graph canvas         │
-│ co-architect       │                                     │
-├────────────────────┴─────────────────────────────────────┤
-│ Storyboard: trigger · payload · play · step · reset       │
-└──────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│ produkt / workspace      Undo   Layout   Fit   Shortcuts      │
+├───────────────────┬───────────────────────────────────────────┤
+│ Code | Chat       │                                           │
+│                   │                                           │
+│ DSL editor or     │           Graph canvas                    │
+│ co-architect      │   services · schemas · UI cards            │
+│                   │                                           │
+├───────────────────┴───────────────────────────────────────────┤
+│ Storyboard   Trigger   Payload       Play  Step  Reset         │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-- Desktop starts with a resizable left authoring panel and a flexible canvas occupying the remaining width.
-- At narrow widths, authoring and canvas become switchable views; keep storyboard controls reachable and avoid compressing the canvas into an unusable strip.
-- Keep primary workspace actions in a compact top toolbar: workspace title, undo/redo when supported, auto-layout, fit view, and keyboard shortcut help.
-- Persist panel sizing only if workspace persistence is later introduced; initial state can be session-local.
+The initial dual view should make the core proposition obvious: source and conversation on the left; their spatial result on the right. Do not force the user to open a separate “diagram” page. Keep the storyboard controller anchored at the bottom, compact when idle and expandable for payload details.
 
-## Component patterns
+On small screens, switch between Canvas, Code, and Chat views instead of squeezing all three into columns. Keep graph and editor state unchanged when switching. The storyboard controller may collapse to a single trigger/status row with a dedicated expand action.
 
-### Authoring panel
+## 4. Information architecture and key screens
 
-Use accessible tabs for **Code** and **Chat**. Code uses a monospaced editor with line numbers, syntax highlighting, and inline parse diagnostics. The editor has a persistent accessible label and concise shortcut/help text. Chat uses distinct user/assistant messages, a streaming indicator, a composer, and a clear `/stitch` affordance. Graph proposals have a review summary and explicit **Apply to canvas** action.
+### Workspace / Canvas
 
-### Architecture Service node
+The main work surface. Toolbar actions: workspace label, undo/redo when implemented, auto-layout, fit view, add node, and keyboard help. Canvas controls should not duplicate every command already available by keyboard.
 
-Slate surface with a compact service icon, name, optional technology/detail line, and typed connection handles. Show input and output ports with text labels or accessible descriptions. Selected nodes use an indigo border/focus ring; simulated activity also uses a signal marker and textual state.
+### Code tab
 
-### Data Schema node
+Monospaced editor with line numbers, minimal syntax color, diagnostics in context, and a small parse status. Show the last successful sync revision/time when the visible canvas is stale. Keep editor input responsive while parsing is debounced.
 
-Slate surface with a data/schema glyph, schema name, and a short field preview. Render field names and types in JetBrains Mono. Keep long schemas collapsible and show a count or expansion affordance.
+### Chat tab
 
-### UI Wireframe node
+Conversation history, composer with `/stitch` command hint, stream status, and retry/cancel states. New graph output is a proposal object with a concise summary and preview controls, separate from regular explanatory prose. Include explicit **Apply proposal** and **Discard** actions.
 
-Represent a small form, button, or list as a low-fidelity wireframe card. Inputs and actions have named connection handles. Show mock values and data mappings in a compact inspectable panel, not as decorative UI chrome.
+### Node inspector
+
+Selecting a node opens a contextual inspector or inline detail region, not a large permanent sidebar that steals canvas width. It edits service details, schema fields, wireframe fields/actions, mock values, or mappings according to node type.
+
+### Storyboard mode
+
+The bottom controller chooses the trigger, edits/loads a sample payload, and controls play/pause, step, reset, and inspect. A step list or payload inspector explains the current simulated state. Avoid theatrical animation; the signal should make causality legible.
+
+## 5. Node, port, and edge language
+
+### Architecture Service
+
+Surface: slate panel with a strong title, optional short technology/role line, and input/output ports. A service’s kind should be readable even without its icon. Use compact metadata and allow details in the inspector.
+
+### Data Schema
+
+Surface: schema title and a concise field preview (`id: UUID`, `total: Decimal`). Show a field count and collapse/expand control when more fields exist. Use monospace for field names and types, sans serif for descriptions.
+
+### UI Wireframe
+
+Surface: a recognizable low-fidelity form, action/button, or list. Use actual field/action names and example values so the card teaches the intended interaction. Avoid polished fake screenshots or styling controls that imply a full design editor.
+
+### Typed ports and mappings
+
+Ports have names, directions, and compatible data kinds. When creating a connection, indicate the target and mapping; when incompatible, explain why and allow a deliberate override only if supported. Selection and keyboard focus increase handle visibility. Provide a non-drag connection path for keyboard users.
 
 ### Edges and routing
 
-Use muted slate for ordinary connections and indigo for selection. Use indigo plus emerald signal cues during storyboard playback. Prefer simple orthogonal/step-like routes when they improve legibility and use a visible fallback route when needed. Dagre arranges graph nodes; it does not guarantee edge-crossing elimination, so preserve manual adjustment and avoid promising crossing-free output.
+Default edges are `#475569`; selected edges use indigo; active storyboard edges use `#818CF8` with an emerald directional marker or label. Route style should favor legibility and predictable attachment points. Layout (node coordinates) and routing (edge path) are separate systems. Dagre supplies node layout; it is not a crossing-free edge router. Choose React Flow edge types/custom routing based on observed cases, preserve a visible fallback, and keep labels from colliding with nodes where possible.
 
-### Storyboard controller
+## 6. DSL and graph document
 
-Anchor a compact control strip along the bottom edge. It includes trigger selection, editable sample payload, play/pause, step, reset, and a concise current-step label. During playback, visually mark the active node and edge and provide a payload inspector. Respect reduced-motion preferences; transitions should communicate progression and remain brief.
-
-## Interaction and states
-
-- Canvas supports drag-to-pan, wheel/pinch zoom, fit-to-view, selection, keyboard movement where practical, and visible keyboard shortcut help.
-- Provide clear idle, hover, selected, focused, running, success, parse-error, chat-loading, and chat-error states.
-- Keep the last valid graph visible while the DSL has an error. Mark the stale canvas state and link the diagnostic to the editor location.
-- Show a pending assistant graph proposal separately from applied state. Applying one should be undoable when undo is implemented.
-- Canvas node/edge state and DSL text share one normalized Zustand workspace model. Derived layout coordinates and transient selection/playback state should be separated from authored graph content.
-
-## DSL and graph model
-
-Use a deliberately small, line-oriented grammar for the first release:
+The native MVP DSL is intentionally small and readable; it is inspired by diagram-as-text tools but is not a promise of Mermaid or PlantUML compatibility.
 
 ```text
 service API [label="API Gateway"]
 schema Order [label="Order"]
 ui Checkout [label="Checkout Form"]
-API -> Order [label="creates"]
-Checkout -> API [label="submit"]
+Checkout.submit -> API.createOrder [label="POST /orders"]
+API.createOrder -> Order [label="writes"]
 ```
 
-Node kinds are `service`, `schema`, and `ui`. Identifiers are stable, unique tokens; labels and edge labels are optional quoted strings. Blank lines and `#` comments are ignored. Invalid lines produce a line/column diagnostic. Do not infer executable behavior from this syntax.
+Rules for the first grammar:
 
-Represent parsed content as a validated graph document containing nodes, edges, and supported metadata. Keep stable IDs across parse/serialize cycles. UI mappings and sample values are structured metadata. If metadata cannot be represented in the textual grammar, retain it in the graph document and clearly define its serialization behavior instead of silently discarding it.
+- Node declarations use `service`, `schema`, or `ui`; IDs are stable and unique.
+- Connections identify source and destination, optionally including named ports, followed by an optional label.
+- Quoted labels support escaped quotes; blank lines and `#` comments are ignored.
+- Parsing returns a document plus source diagnostics; it never executes content.
+- Identifiers and endpoints must resolve. Invalid source must not partially replace the current valid graph.
+- Wireframe field/action details and mock values need an explicit representation. Prefer extending the grammar with structured declarations or a documented metadata block; do not keep invisible metadata that gets lost on round-trip.
 
-## State and rendering architecture
+Graph document separates authored data (IDs, kinds, labels, ports, mappings) from derived layout coordinates and transient UI state (selection, viewport, playback). Use revision/source-origin metadata to prevent DSL↔canvas update loops.
 
-- **Zustand workspace store:** authored graph, DSL source, active editor tab, conversation history, pending AI proposal, and storyboard mock data/state.
-- **DSL module:** parser, validator, formatter/serializer, and source diagnostics. Debounce parse requests by 150 ms; only commit a graph when the source parses successfully.
-- **Layout module:** Dagre layout receives validated nodes/edges and returns positions. Do not rerun on each pointer move; expose explicit auto-layout and use it after DSL graph changes where appropriate.
-- **Canvas layer:** React Flow renders custom node types and supports pan/zoom, selection, and edge editing. Use visibility/rendering options for off-screen content and profile custom node cost at the 500-node target.
-- **Chat layer:** Vercel AI SDK handles streaming through a server route. Validate proposed graph data before showing an apply action; keep credentials server-side.
-- **Storyboard module:** deterministic local reducer advances a mock payload over graph connections. No real network calls or code execution.
+## 7. Interaction and state transitions
 
-## Accessibility
+### DSL sync
 
-- Label the editor, chat composer, canvas controls, node controls, and storyboard actions.
-- Provide keyboard shortcuts for pan/zoom, fit-to-view, and navigation; ensure shortcuts do not steal text-editor keystrokes.
-- Ensure canvas elements can receive focus and have accessible names that include node type and label. Provide a keyboard path to inspect connected edges and nodes.
-- Use visible focus indicators, status text, and icons/shapes in addition to color.
-- Announce parse diagnostics and storyboard step changes through a restrained live region.
-- Honor reduced-motion preferences and preserve browser zoom.
+`typing → 150 ms idle → parse/validate → valid: commit graph revision → layout if needed → render`
 
-## Responsive behavior
+`typing → parse/validate → invalid: keep last valid graph → show diagnostic → mark canvas as previous valid revision`
 
-At wide sizes, keep the editor/chat panel and canvas side by side. At compact sizes, provide a clear Canvas/Code/Chat view switcher and retain the same graph state. Keep the storyboard bar collapsible if vertical space is limited. Controls should remain usable with touch targets of at least 40 px where practical.
+Canvas edits update authored graph data, then serialize supported changes to DSL with stable IDs. Moving a node changes layout coordinates without rewriting DSL unless position persistence becomes a documented DSL feature. This avoids noisy source changes after simple arrangement.
+
+### AI proposal
+
+`request → stream explanation/proposal → validate schema/references → preview diff → apply or discard`
+
+The proposal should show nodes/edges added, changed, and removed before application. Applying merges only the proposed delta and must not silently discard unrelated user changes made while the response was streaming.
+
+### Storyboard
+
+`choose trigger → validate payload → ready → play/step → show active edge/node and resulting mock state → pause/reset/complete`
+
+Simulation is a deterministic traversal over declared links and mock mappings. Branches require an explicit rule or a user-selected path; cycles require a visible stop/iteration rule. Missing mapping and terminal conditions are inspectable states.
+
+## 8. Front-end architecture
+
+- **Next.js App Router:** server-render the application shell where useful; put graph interaction in client components. Use a route handler as the AI transport boundary.
+- **Workspace store (Zustand):** authored graph, source text/revision, chat history, proposal, and mock simulation. Separate derived coordinates/viewport and transient interaction state where appropriate.
+- **DSL package/module:** parser, validator, formatter, source map/diagnostics, and schema for AI graph proposals. Pure functions with no React dependency.
+- **Layout adapter:** Dagre input/output conversion; invoke on valid topology changes or explicit layout, not on each pointer move.
+- **Canvas adapter:** React Flow node/edge types, typed connection validation, keyboard behavior, and rendering/visibility optimization.
+- **AI route:** Vercel AI SDK streaming and structured graph output; validate server response and validate again before client application. Provider secrets stay server-side. Use `@langchain/core` only if its specific abstractions are needed; avoid overlapping libraries without an architectural reason.
+- **Storyboard engine:** deterministic pure traversal/reducer over the graph and sample values. It has no network or code-execution capability.
+
+React Flow’s own guidance treats layout as integration with external engines; Next.js route handlers provide an App Router server boundary; Vercel AI SDK supports streaming and structured output. See the technical references in [PRD.md](PRD.md).
+
+## 9. Accessibility and resilience
+
+- Persistent accessible labels for editor and chat; diagnostics associated with source lines and announced without moving focus unexpectedly.
+- Keyboard equivalents for pan, zoom, fit, node/edge navigation, connection creation, and storyboard controls. Shortcuts are discoverable and do not override text editing.
+- Focusable graph items have names including type, title, and relevant port/edge context. Provide a list/tree navigation mode when spatial navigation alone is insufficient.
+- State uses contrast, text, icon/shape, and position cues; color is supplementary.
+- Respect reduced motion and browser zoom. Keep targets comfortably operable.
+- Parse failures, unsupported edges, chat transport failures, and invalid proposals preserve the last known valid state and provide a recovery action.
+
+## 10. Performance and scale
+
+The product target is navigability for 500+ nodes, not an unverified frame-rate claim. Use React Flow visibility/rendering features, memoized custom nodes, narrow Zustand selectors, and deferred layout. Avoid re-parsing or full layout during drag. Establish a representative benchmark graph and supported hardware before setting latency/frame budgets. Large schemas and chat histories should be collapsed or paginated/virtualized at their own boundaries.
+
+## 11. Visual quality review checklist
+
+- Does the first screen clearly show text/chat, graph, and storyboard as one workbench?
+- Does the authored graph remain the visual focus instead of panels and toolbar chrome?
+- Are node types identifiable by labels and structure, not just color?
+- Are edges easy to follow at fit-to-view and close zoom levels? Are fallback cases still legible?
+- Does the wireframe look intentionally low fidelity but contain meaningful labels and data?
+- Can a user distinguish suggested, applied, invalid, and simulated state immediately?
+- Does the interface remain information-rich without reducing text to tiny labels or filling the screen with cards?
+- Are keyboard focus, reduced motion, narrow screens, and high zoom usable?

@@ -7,6 +7,13 @@ produkt is an interactive visual workspace for designing and explaining software
 - [PRD.md](PRD.md) defines users, scope, behavior, and acceptance criteria.
 - [DESIGN.md](DESIGN.md) defines the visual language, interaction patterns, and front-end architecture.
 
+## Product boundaries
+
+- Build produkt as a hybrid of text-authored diagrams, a spatial architecture canvas, conversational graph proposals, and low-fidelity UI/data storyboards.
+- FlowStitch is the preferred concept name; the repository/product name remains `produkt`.
+- The native MVP DSL is Mermaid-inspired, not Mermaid- or PlantUML-compatible by default.
+- The storyboard is deterministic local simulation. Never make real backend calls or execute user/model-authored code from it.
+
 ## Technical constraints
 
 - Use Next.js 15 or later with the App Router and TypeScript.
@@ -21,7 +28,8 @@ produkt is an interactive visual workspace for designing and explaining software
 
 - Keep graph parsing, graph layout, Zustand state, custom node rendering, chat transport, and storyboard simulation in separate modules with typed boundaries.
 - Treat the DSL as untrusted input. Parse it into a validated intermediate graph before updating canvas state. Never execute DSL text or simulated payloads as code.
-- Preserve user-authored DSL during edits. Canvas edits must serialize back to DSL without dropping unsupported or unmodified constructs.
+- Preserve stable graph IDs and supported metadata during DSL/canvas edits. Keep derived canvas coordinates separate from authored source unless position persistence becomes an explicit DSL feature.
+- Parse into a validated graph document before applying changes. Never silently discard graph metadata that has no documented DSL representation.
 - Debounce DSL parsing by 150 ms. A parse error must retain the last valid graph and show an actionable editor diagnostic.
 - Keep storyboard execution local and deterministic; it must not call or execute a user's backend.
 - Keep the canvas usable with keyboard controls and assistive technology. Include accessible names, visible focus, and non-color simulation status cues.
@@ -32,5 +40,5 @@ produkt is an interactive visual workspace for designing and explaining software
 ## Completion expectations
 
 - Meet the acceptance criteria in [PRD.md](PRD.md) for any delivered feature.
-- Do not claim that Dagre guarantees zero edge crossings. Use layout and routing choices to reduce crossings, and provide a readable fallback when routing cannot avoid them.
+- Treat node layout and edge routing as separate systems. Do not claim Dagre guarantees zero edge crossings; provide readable routing and a visible fallback.
 - Do not add tests or run test suites unless the user requests testing or verification.

@@ -1,124 +1,195 @@
 # produkt — Product Requirements Document
 
-**Status:** Initial product definition  
-**Working concept:** FlowStitch (also considered: CanvasCraft, DiagramVerse)  
-**Product name:** produkt
+**Product:** produkt
+**Concept name:** FlowStitch (preferred); alternatives explored: CanvasCraft, DiagramVerse
+**Document status:** Product brief for MVP definition
+**Audience:** Product, design, and engineering
 
-## 1. Product summary
+## Executive summary
 
-produkt is a dark, infinite-canvas engineering workspace for sketching software architecture, connecting it to interface and data concepts, and explaining behavior through a simulated flow. Users can author a graph in a compact text DSL or ask an AI co-architect to create and revise it. The same graph appears as editable visual nodes, with links that can be explored in a storyboard without running a real service.
+produkt is a visual system-design workspace that brings together three ways of thinking: a diagramming language, a spatial canvas, and a conversational co-architect. A user describes architecture in text or chat, sees it arranged as a readable graph, then places lightweight interface sketches beside it and connects their controls to data and services. A storyboard carries sample payloads through that graph so a team can reason about an experience without integrating or running a backend.
 
-## 2. Problem and opportunity
+The product takes inspiration from PlantUML’s expressiveness, Mermaid’s cleaner modern diagrams, Miro’s open-ended spatial canvas, Stitch-style conversational design, and Figma’s approachable interface sketching. Its distinctive job is to connect those artifacts in one model rather than reproduce each product in full.
 
-Architecture discussions often split diagrams, code snippets, UI sketches, and example payloads across separate tools. That makes it hard to see how an interface relates to a service, where data moves, or how a proposed change affects a flow. produkt brings those artifacts into one workspace and keeps the written and visual graph synchronized.
+## The problem
 
-## 3. Users and primary jobs
+Today, a system idea often moves between a diagram language, a manually arranged whiteboard, a chat thread, and UI mockups. PlantUML can express complex systems but its output can feel dense or dated. Mermaid is quick to author and often reads more cleanly, but it is not an open spatial workspace for placing interface concepts beside architecture. Miro gives teams room to think but requires substantial manual drawing. Figma can make interface concepts tangible, but detailed design work is unnecessary when the question is only how inputs map to system data and what a sample flow looks like.
 
-- **Software architects and engineers:** quickly express, review, and revise service and data relationships.
-- **Product designers and product managers:** connect interface mockups to the services and data they depend on.
-- **Technical collaborators:** use a reproducible storyboard to explain a proposed request or event flow.
+This fragmentation makes it difficult to answer: “What does this interface action call, what data does it send, and what happens next?” produkt makes that relationship visible and discussable early.
 
-Primary job: “Help me turn an architecture idea into a shared, editable visual model and show how a sample event moves through it.”
+## Vision and product promise
 
-## 4. Product principles
+**Vision:** a shared visual workbench where people can move from architecture idea to connected interface storyboard in minutes.
 
-1. Text and canvas are two views of one model, not competing copies.
-2. AI proposes changes; the user can inspect and edit them.
-3. Storyboard simulation is safe, local, and clearly distinguished from real execution.
-4. Dense information remains readable through hierarchy, routing, and progressive disclosure.
-5. Keyboard and screen-reader access are part of the canvas interaction model.
+**Promise:** describe or discuss a system, arrange it as a legible graph, connect a rough interface to it, and trace a sample event safely—without hand-drawing every connector or building a working integration.
 
-## 5. Core experience
+## Target users and jobs
 
-### Workspace entry
+### Primary users
 
-Open a workspace into a dark engineering workbench with a left panel and a large canvas. The left panel has **Code** and **Chat** tabs; the canvas shows a subtle grid and the current graph. A bottom storyboard controller is available without obscuring the canvas.
+- **Engineers and software architects** shaping services, data boundaries, and event/request flows.
+- **Product designers** exploring UI structure and system dependencies before high-fidelity design.
+- **Product managers and technical leads** communicating a proposed experience to engineering and design partners.
 
-### Author in the DSL
+### Jobs to be done
 
-Users type a Mermaid-like graph DSL. After a 150 ms debounce, valid input is parsed and laid out, then rendered as editable canvas nodes and edges. The first release supports named nodes, node kinds, directed connections, and optional labels. Exact grammar and serialization rules are defined in DESIGN.md. Invalid input displays an inline diagnostic and keeps the last valid graph visible.
+1. When I have an architecture idea, let me express it in text or conversation and get a diagram I can edit.
+2. When architecture becomes dense, help me keep the diagram readable and let me adjust its spatial arrangement.
+3. When I sketch an interface concept, let me connect its actions and fields to architecture endpoints without building a full Figma prototype.
+4. When I need to explain a flow, let me trace a sample payload through the graph without calling real services.
 
-### Co-create with chat
+## Product principles
 
-Users can switch to Chat and issue `/stitch` followed by an architecture request. The assistant streams a proposed graph or edit. The user can apply it to the workspace, then continue editing in either view. The UI must distinguish a pending proposal from applied graph state. Chat is an assistant for drafting and revising diagrams, not an autonomous system operator.
+1. **One model, multiple authoring surfaces.** DSL, chat proposals, and canvas edits should converge on a validated graph document.
+2. **Readable by default, editable by choice.** Auto-layout and routing reduce manual cleanup; users retain control over positions and connections.
+3. **AI is a co-author.** It proposes, explains, and revises. The user reviews and applies graph changes.
+4. **Sketch the system boundary.** UI cards communicate structure and data mappings, not pixel-perfect visual design.
+5. **Simulation is explicitly simulated.** Storyboard data is local and cannot be mistaken for a live integration test.
+6. **Complexity is progressive.** Large graphs and schemas remain navigable through grouping, collapse, and inspection rather than tiny unreadable labels.
 
-### Connect UI and data concepts
+## Product scope and boundaries
 
-Users can add Architecture Service, Data Schema, and UI Wireframe nodes. Wireframe nodes represent lightweight mock components such as forms, buttons, and lists. Users can connect an input or action to an architecture/data endpoint to describe intended mappings. The first release supports editable labels and sample mock values, not a production design tool or a live Figma integration.
+### In the MVP
 
-### Tell a flow with Storyboard
+- A desktop-first, infinite graph canvas with an adjacent Code/Chat panel and a bottom storyboard controller.
+- A small typed diagram DSL and bi-directional graph synchronization.
+- Architecture Service, Data Schema, and UI Wireframe node families.
+- Dagre-based node layout and clean edge rendering with routing fallbacks.
+- `/stitch` conversational drafting with streaming responses and explicit proposal application.
+- Local sample-payload simulation with play, pause, step, inspect, and reset.
+- Local workspace state using Zustand; persistence can be added after the core interaction is validated.
 
-Users select a trigger and sample payload in the bottom controller. Starting the storyboard advances the payload along connected edges, highlighting active nodes and showing the mapped mock state at each stop. Users can pause, step, reset, and inspect the payload. This simulation is local and never invokes a real backend.
+### Explicitly out of scope for MVP
 
-## 6. Functional requirements
+- Live backend calls, API integration testing, code execution, or deployment.
+- Multi-user presence, shared editing, comments, or conflict resolution.
+- Cloud workspace persistence, accounts, billing, and version history.
+- Figma import/export or a full-fidelity UI design editor.
+- Support for arbitrary PlantUML/Mermaid syntax or a promise of crossing-free layouts for every graph.
 
-### Canvas and graph
+## Core user experience
 
-- Provide pan, zoom, fit-to-view, selection, node movement, edge creation, and deletion.
-- Support three node families: Architecture Service, Data Schema, and UI Wireframe.
-- Provide automatic layout using Dagre when parsing or explicitly requested. Layout should reduce overlap and edge crossings; it cannot promise that crossings are eliminated for every graph.
-- Provide a readable fallback edge style when preferred routing is unavailable.
-- Maintain usable interaction for graphs of 500 or more nodes through canvas visibility/rendering optimizations.
+### Entry and orientation
 
-### DSL and state synchronization
+Opening produkt presents a working canvas immediately. The Code/Chat panel sits on the left; the interactive canvas takes the remaining space. A compact top toolbar exposes workspace name, auto-layout, fit-to-view, and shortcut help. The bottom storyboard bar is visible and compact. A useful starter graph or an explicit empty-state prompt should show how services, schemas, UI cards, and links fit together.
 
-- Keep DSL text, graph nodes, and graph edges synchronized through a single Zustand-backed workspace state.
-- Parse after 150 ms of inactivity. Do not replace the last valid graph when the current text has errors.
-- Serialize supported canvas edits back into the DSL while preserving stable node IDs and supported metadata.
-- Surface parse errors with line/column where available and an accessible association to the editor.
+### Author architecture in text
 
-### Chat
+The user enters a deliberately constrained Mermaid-like DSL. Valid changes are parsed after 150 ms of inactivity, validated, then reflected in the canvas. Parse errors are shown at their source location while the last valid graph remains rendered. Text and graph edits share stable node/edge identity; a canvas edit serializes back to text without silently losing supported metadata.
 
-- Support streaming assistant responses and the `/stitch` command.
-- Provide an explicit apply action for graph proposals.
-- Keep chat history in workspace client state. Do not expose model/provider credentials to the browser.
-- Show useful loading, error, and retry states.
+### Co-design with conversation
 
-### Storyboard
+The user opens Chat and enters `/stitch` plus an intent, such as “Add a checkout flow that writes an order and emits a confirmation event.” The assistant streams an explanation and a typed graph proposal. The proposal is previewable, validated, and explicitly applied. Follow-up instructions can refine the current proposal or applied graph. The assistant must state uncertainty when the requested change is ambiguous and ask a focused follow-up inside the product where needed.
 
-- Allow a sample payload to be associated with a trigger node.
-- Visualize the current node/edge and payload progression with shape, text, and color cues.
-- Support start, pause, step, reset, and payload inspection.
-- Use deterministic local mock rules; never execute user-authored code or contact a production endpoint.
+### Sketch an interface and connect it
+
+The user adds a UI Wireframe card (form, button/action, or list) from a small palette. They can name fields/actions, set example values, and draw connections from them to schema fields, service inputs, or outputs. A mapping is a named relationship, not executable transformation code. The canvas shows enough mapping information to understand intent while keeping the node legible; details are inspectable on selection.
+
+### Storyboard a sample flow
+
+The user picks a trigger and supplies a JSON-like sample payload. Starting the storyboard advances a deterministic mock event through reachable links. The active node and edge are highlighted, the payload is inspectable at each step, and mock UI state updates from declared mappings. Users can pause, step, reset, or change the payload. Cycles, branches, and missing mappings must be surfaced as simulation conditions, not hidden or treated as real runtime behavior.
+
+## Functional requirements
+
+### Graph model and canvas
+
+- Render an infinite pannable/zoomable canvas using `@xyflow/react`.
+- Support Architecture Service, Data Schema, and UI Wireframe node types with typed handles.
+- Allow add, select, move, connect, edit, and delete operations; support fit-to-view and explicit auto-layout.
+- Use `@dagrejs/dagre` for node positioning. Treat edge routing as a separate rendering decision; Dagre does not itself guarantee non-overlapping edges.
+- Prefer readable routes and spacing. If a route conflicts, loops, or is unsupported, render a visible fallback and preserve edge identity/editability.
+- For graphs of 500+ nodes, use React Flow visibility options, bounded selectors, and avoid expensive whole-graph recalculation during pointer movement. Define measurable performance targets before implementation profiling.
+
+### DSL and synchronization
+
+- Maintain DSL source, validated graph, source diagnostics, and synchronization status in the workspace store.
+- Parse after 150 ms debounce. Only valid parse results replace the last valid graph.
+- Serialize supported canvas changes and metadata back to DSL while preserving stable identifiers.
+- Prevent update loops by distinguishing source edits from graph-derived serialization and by tracking document revisions.
+- Surface diagnostics with line/column, keyboard focus path, and an accessible announcement.
+
+### Chat co-architect
+
+- Provide a streaming chat interface invoked through `/stitch`.
+- Keep assistant history in local workspace state for the current session.
+- Return graph proposals as schema-validated structured data alongside a human-readable rationale.
+- Preview changes and require explicit apply; never trust model output as valid graph data until validated.
+- Keep provider credentials server-side and use a server route for model requests.
+- Handle rate limits, network/model errors, cancellation, and retry without damaging the current graph.
+
+### Wireframes and mappings
+
+- Provide a small palette of form, action/button, and list wireframe elements.
+- Support editable labels, field/action names, example values, and typed connections.
+- Show mapping direction and destination clearly; surface missing or incompatible endpoints.
+- Do not imply pixel-level fidelity, real integration, or executable data transformations.
+
+### Storyboard simulation
+
+- Start only from a chosen trigger and a valid sample payload.
+- Advance according to graph connections and declared mock mappings using deterministic local rules.
+- Support start/pause, single-step, reset, and current payload inspection.
+- Show branch selection, cycles, unmapped fields, and terminal nodes explicitly.
+- Make no network requests and execute no user or AI supplied code.
 
 ### Accessibility and resilience
 
-- Give the DSL editor an accessible name and instructions; expose diagnostics to assistive technology.
-- Provide keyboard-accessible canvas pan/zoom, selection, and node/edge navigation, with visible shortcut help.
-- Preserve readable focus indicators and adequate contrast across the dark palette.
-- Retain a usable last-valid canvas during DSL parse failures, chat failures, and unsupported node data.
+- Label the DSL editor and chat composer; expose diagnostic and streaming status accessibly.
+- Provide keyboard shortcuts for pan, zoom, fit-to-view, node navigation, and edge inspection; avoid hijacking editor typing.
+- Ensure nodes, handles, menus, and storyboard controls have keyboard paths, accessible names, and visible focus.
+- Communicate selection, error, and playback state through text/icon/shape as well as color.
+- Preserve the last valid canvas during parser or chat failures; support usable fallback edges and unsupported node data.
 
-## 7. MVP scope
+## Non-functional requirements
 
-**Included:** single-workspace client state; DSL-to-graph and graph-to-DSL synchronization; Dagre auto-layout; three custom node families; manual canvas edits; streaming `/stitch` chat proposals; local storyboard simulation; keyboard-accessible core controls; responsive panel sizing.
+- **Responsiveness:** DSL-to-canvas update begins within 150 ms after typing stops, excluding layout/render time.
+- **Scale:** remain navigable at 500 nodes; benchmark target devices before setting hard frame-rate budgets.
+- **Safety:** no backend execution in storyboard; no client exposure of model credentials; validate all DSL and AI graph input.
+- **Maintainability:** separate parser, document model, layout, canvas presentation, AI transport, and simulation logic behind typed interfaces.
+- **Responsive use:** desktop is the primary authoring experience; compact view switches between Canvas, Code, and Chat without losing state.
 
-**Not included in MVP:** real backend execution, production API testing, multi-user collaboration, cloud persistence/version history, authentication, billing, import/export integrations, full design editing, or a live Figma connection.
+## Success criteria
 
-## 8. Success measures
+### MVP validation outcomes
 
-- A new user can create a small service graph in the DSL and see it on canvas without a page reload.
-- A canvas edit is reflected in the DSL and remains stable after a subsequent parse.
-- Invalid DSL leaves the last valid canvas intact and identifies the error.
-- A `/stitch` response can be reviewed and explicitly applied as a graph proposal.
-- A sample storyboard can be started, paused, stepped, inspected, and reset without a backend call.
-- Core canvas actions can be reached and understood using keyboard and screen reader controls.
-- A 500-node graph remains navigable with visibility optimizations enabled.
+- A first-time user can create a small architecture in DSL and understand how to edit it visually.
+- A user can make a canvas change and see it reflected in DSL without ID churn or lost supported data.
+- A user can create a wireframe, connect an action to a system endpoint, and explain the mapping to a teammate.
+- A user can request an architecture change in chat, inspect it, and apply it without overwriting unrelated graph content.
+- A user can simulate a sample flow and tell which steps are mock behavior.
+- A 500-node document remains navigable without forcing a full layout on every drag.
 
-## 9. Risks and product decisions
+### Product measures to instrument after MVP
 
-- **DSL round-trip fidelity:** define a constrained grammar and stable IDs; reject or preserve unknown constructs rather than silently dropping them.
-- **Graph readability:** automatic layout is a starting point. Users retain manual positioning, and edge routing degrades gracefully.
-- **AI variability:** treat output as a validated proposal; never apply unvalidated model output directly to graph state.
-- **Large graphs:** use React Flow rendering/visibility options and avoid recomputing layout during ordinary node dragging.
-- **Scope:** collaboration and persistence are deliberately deferred so the first release can prove the integrated authoring and simulation loop.
+- Time from opening workspace to first valid graph.
+- DSL parse success and correction rate.
+- Percentage of AI graph proposals accepted, edited, or discarded.
+- Percentage of graphs that include at least one UI-to-data mapping.
+- Storyboard completion, reset, and branch-inspection rates.
+- User-reported diagram readability on small, medium, and large graphs.
 
-## 10. MVP acceptance criteria
+These are measures to collect, not claims about current performance or adoption.
 
-1. The initial workspace presents code/chat on the left, canvas on the right, and storyboard controls at the bottom.
-2. A valid DSL graph renders as custom nodes and directed edges; editing either view updates the shared model.
-3. Parsing is debounced by 150 ms and syntax failures preserve the last valid rendered graph.
-4. Dagre layout runs on request or a valid graph update and produces a readable arrangement; edge fallback remains visible for unsupported routes.
-5. `/stitch` streams a response and graph changes require user review and an explicit apply action.
-6. Storyboard controls simulate a payload through connected nodes locally and can pause, step, inspect, and reset.
-7. Keyboard navigation, canvas pan/zoom shortcuts, editor labeling, and visible focus are available.
-8. The 500-node target is addressed with canvas visibility/rendering optimizations rather than eager custom rendering of every off-screen node.
+## Assumptions and open product decisions
+
+- **Project naming:** repository/product name is `produkt`; FlowStitch remains the concept name and preferred outward-facing candidate until branding is decided.
+- **First-run content:** seed an editable sample architecture rather than presenting a blank canvas; validate this with onboarding feedback.
+- **DSL compatibility:** define a native minimal DSL inspired by Mermaid’s readability; do not claim drop-in Mermaid or PlantUML compatibility in MVP.
+- **Workspace persistence:** start with in-memory session state; decide local storage/export before inviting users to author important documents.
+- **Chat provider:** use a provider-neutral Vercel AI SDK integration; choose an actual provider/model during implementation based on availability, cost, privacy, and latency.
+- **Large-graph target:** “500+ nodes” is a navigability target, not a guarantee of a particular frame rate until measured.
+
+## Technical guardrails
+
+- Framework: Next.js 15+ App Router and TypeScript.
+- Styling: Tailwind CSS v4+ with semantic CSS custom properties.
+- Components: Radix UI primitives and shadcn/ui patterns where appropriate.
+- Canvas: `@xyflow/react`; layout: `@dagrejs/dagre`.
+- State: Zustand for workspace and transient interaction state, with derived state kept separate from authored graph content.
+- AI: Vercel AI SDK (`ai`) for streaming and structured output. Include `@langchain/core` only if a concrete message/model abstraction is needed; it is not automatically required alongside the AI SDK.
+
+## References informing technical boundaries
+
+- React Flow documents layout engines as external integrations and separates layout from edge-routing options: [Layouting overview](https://reactflow.dev/learn/layouting/layouting).
+- Next.js App Router supports server route handlers for request/response endpoints: [Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers).
+- Vercel AI SDK supports streaming and structured output, useful for separating chat text from validated graph proposals: [AI SDK](https://vercel.com/docs/ai-sdk).

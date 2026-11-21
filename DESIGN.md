@@ -135,6 +135,7 @@ Rules for the first grammar:
 - Parsing returns a document plus source diagnostics; it never executes content.
 - Identifiers and endpoints must resolve. Invalid source must not partially replace the current valid graph.
 - Wireframe field/action details and mock values need an explicit representation. Prefer extending the grammar with structured declarations or a documented metadata block; do not keep invisible metadata that gets lost on round-trip.
+- Canvas serialization includes explicit connection IDs. Legacy connections without IDs retain their identity by endpoint when the source is edited in the same workspace. `port input` and `port output` represent standalone named ports, and `map "edge-id" sourceField -> destinationField` represents a field copy on a connection. A service output may connect to a wireframe input so a storyboard can show mapped mock UI state.
 
 Graph document separates authored data (IDs, kinds, labels, ports, mappings) from derived layout coordinates and transient UI state (selection, viewport, playback). Use revision/source-origin metadata to prevent DSL↔canvas update loops.
 
@@ -148,17 +149,23 @@ Graph document separates authored data (IDs, kinds, labels, ports, mappings) fro
 
 Canvas edits update authored graph data, then serialize supported changes to DSL with stable IDs. Moving a node changes layout coordinates without rewriting DSL unless position persistence becomes a documented DSL feature. This avoids noisy source changes after simple arrangement.
 
+Authored graph changes require a committed source revision. While a source draft is pending or invalid, users can apply, correct, or discard it before changing graph content. Canvas arrangement remains available.
+
+Workspace files are versioned JSON documents. They carry the committed DSL, an optional source draft, and the graph's node positions and data metadata. The author can opt in to including a storyboard trigger and valid sample JSON. Import validates the source, graph, and any storyboard setup together and shows a preview before replacing the open workspace. The receiving browser starts a fresh chat and storyboard run.
+
 ### AI proposal
 
 `request → stream explanation/proposal → validate schema/references → preview diff → apply or discard`
 
-The proposal should show nodes/edges added, changed, and removed before application. Applying merges only the proposed delta and must not silently discard unrelated user changes made while the response was streaming.
+The current proposal format supports additions. The preview shows nodes, connection endpoints, and field mappings. Refinement creates another draft. Applying revalidates the proposed delta against the current graph to preserve unrelated intervening edits.
 
 ### Storyboard
 
 `choose trigger → validate payload → ready → play/step → show active edge/node and resulting mock state → pause/reset/complete`
 
 Simulation is a deterministic traversal over declared links and mock mappings. Branches require an explicit rule or a user-selected path; cycles require a visible stop/iteration rule. Missing mapping and terminal conditions are inspectable states.
+
+Playback defaults to the first link in document order whose destination has not been visited. The branch selector can override that choice. A mapped link copies only its declared fields. If a mapped field is absent from the payload leaving a service, the storyboard uses the field's declared example text as a mock output and names it in the trace. An unmapped link passes the current payload through with a status message. Mapped values populate the destination wireframe preview. Cycles stop the run. Each visited node has a payload snapshot.
 
 ## 8. Front-end architecture
 
